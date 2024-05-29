@@ -20,7 +20,7 @@ export default function RootLayout({ children }) {
             <div className="flex justify-center items-start w-1/5 border-r-2">
               <Sidebar />
             </div>
-            <div className="w-2/5">{children}</div>
+            <div className="w-3/5">{children}</div>
             <div className="w-2/5 hidden md:block">
               <News />
             </div>

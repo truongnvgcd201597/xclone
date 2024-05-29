@@ -2,16 +2,16 @@
 import { useSession } from "next-auth/react";
 import { getDownloadURL, ref, uploadBytesResumable } from "firebase/storage";
 import Image from "next/image";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { IoMdImages } from "react-icons/io";
 import { db, storage } from "../api/firebase";
 import { addDoc, collection } from "firebase/firestore";
 
 const NewHeader = () => {
   const { data: session } = useSession();
-  console.log(session);
   const [image, setImage] = useState(null);
   const [tweet, setTweet] = useState("");
+  const [loading, setLoading] = useState(false);
   const [progress, setProgress] = useState(0);
   const [imageLink, setImageLink] = useState(null);
 
@@ -23,11 +23,13 @@ const NewHeader = () => {
   };
 
   const handleAddContentToFireStore = async () => {
-    if (!image) return;
+    if (!imageLink) return;
 
     try {
       const docRef = await addDoc(collection(db, "tweets"), {
-        username: session.user.name,
+        name: session.user.name,
+        userImage: session.user.image,
+        username: session.user.username,
         userId: session.user.uid,
         imageLink: imageLink,
         timestamp: new Date(),
@@ -36,8 +38,20 @@ const NewHeader = () => {
       console.log("Document written with ID: ", docRef.id);
     } catch (error) {
       console.error("Error adding document: ", error);
+    } finally {
+      setTweet("");
+      setImage(null);
+      setImageLink(null);
+      setProgress(0);
+      setLoading(false);
     }
   };
+
+  useEffect(() => {
+    if (imageLink) {
+      handleAddContentToFireStore();
+    }
+  }, [imageLink]);
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -50,6 +64,7 @@ const NewHeader = () => {
       uploadTask.on(
         "state_changed",
         (snapshot) => {
+          setLoading(true);
           const progress =
             (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
           setProgress(progress);
@@ -62,10 +77,9 @@ const NewHeader = () => {
           getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
             setImageLink(downloadURL);
           });
+          setLoading(false);
         }
       );
-
-      handleAddContentToFireStore();
     } catch (error) {
       console.log(error);
     }
@@ -110,7 +124,8 @@ const NewHeader = () => {
           </label>
           <button
             type="submit"
-            className="py-2 px-4 bg-blue-500 text-white font-bold rounded-full hover:bg-blue-600 transition-all duration-300 brightness-90 active:brightness-100 active:scale-95 shadow-md"
+            className="py-2 px-4 bg-blue-500 text-white font-bold rounded-full hover:bg-blue-600 transition-all duration-300 brightness-90 active:brightness-100 active:scale-95 shadow-md disabled:bg-gray-300 disabled:cursor-not-allowed"
+            disabled={loading || tweet === "" || image === null}
           >
             Post
           </button>
