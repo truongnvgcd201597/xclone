@@ -1,8 +1,9 @@
 import Image from "next/image";
 import React from "react";
+import Status from "./Status";
 
 const Tweet = ({ tweet }) => {
-  const { name, username, userImage, imageLink, content } = tweet;
+  const { id, name, username, userImage, imageLink, content } = tweet;
   return (
     <div className="flex items-start m-4 gap-4 w-full">
       <Image
@@ -17,12 +18,13 @@ const Tweet = ({ tweet }) => {
           <p className="text-sm font-bold">{name}</p>
           <p className="text-xs font-medium text-gray-500">{username}</p>
         </div>
-        <p className="text-sm">{content}</p>
+        <p className="text-md mt-2">{content}</p>
         <img
           src={imageLink}
           alt="tweet"
-          className="w-full h-60 object-cover mt-2 rounded-lg shadow-lg border"
+          className="w-[100%] h-60 object-cover rounded-xl mt-4"
         />
+        <Status id={id} />
       </div>
     </div>
   );

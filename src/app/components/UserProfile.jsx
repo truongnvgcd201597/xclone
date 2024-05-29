@@ -18,7 +18,7 @@ const UserProfile = () => {
             className="rounded-full w-12 h-12"
           />
           <div className="flex flex-col">
-            <p className="text-sm font-bold ml-2">{session.user.name}</p>
+            <p className="text-xs font-bold ml-2">{session.user.name}</p>
             <p className="text-xs font-medium ml-2">{session.user.username}</p>
           </div>
           <BsThreeDotsVertical />

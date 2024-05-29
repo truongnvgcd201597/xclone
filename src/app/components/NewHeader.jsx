@@ -34,6 +34,8 @@ const NewHeader = () => {
         imageLink: imageLink,
         timestamp: new Date(),
         content: tweet,
+        like: [],
+        comment: [],
       });
       console.log("Document written with ID: ", docRef.id);
     } catch (error) {
