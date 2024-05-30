@@ -10,14 +10,17 @@ import React, { useEffect, useState } from "react";
 import { AiOutlineMessage } from "react-icons/ai";
 import { FaRegHeart, FaHeart } from "react-icons/fa6";
 import { FaRegTrashCan } from "react-icons/fa6";
-import { useSession } from "next-auth/react";
 import { db } from "../api/firebase";
+import { useRecoilState } from "recoil";
+import { modalState, postIdState } from "../atom/modalAtom";
+import { useSession, signIn } from "next-auth/react";
 
 const Status = ({ id }) => {
   const [liked, setLiked] = useState(false);
   const [likes, setLikes] = useState([]);
   const [isOwner, setIsOwner] = useState(false);
-
+  const [open, setIsOpen] = useRecoilState(modalState);
+  const [postId, setPostId] = useRecoilState(postIdState);
   const { data: session } = useSession();
 
   useEffect(() => {
@@ -66,7 +69,17 @@ const Status = ({ id }) => {
 
   return (
     <div className="flex justify-start items-center gap-8 mt-4 ml-2">
-      <AiOutlineMessage className="text-2xl text-gray-500 hover:text-blue-500 transition-all duration-300 cursor-pointer hover:scale-110" />
+      <AiOutlineMessage
+        className="text-2xl text-gray-500 hover:text-blue-500 transition-all duration-300 cursor-pointer hover:scale-110"
+        onClick={() => {
+          if (!session) {
+            signIn();
+          } else {
+            setIsOpen(true);
+            setPostId(id);
+          }
+        }}
+      />
       <div onClick={handleLike} className="cursor-pointer">
         {liked ? (
           <FaHeart className="text-2xl text-red-500 hover:scale-110 transition-all duration-300" />
